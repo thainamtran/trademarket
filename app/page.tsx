@@ -1,6 +1,34 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { supabaseClient } from '@/lib/supabase/client'
 
 export default function Home() {
+  const router = useRouter()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabaseClient.auth.getSession()
+      setIsAuthenticated(!!session)
+      setLoading(false)
+    }
+
+    checkAuth()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
+      (_event, session) => {
+        setIsAuthenticated(!!session)
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [])
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-24">
       <div className="max-w-4xl mx-auto text-center">
@@ -35,18 +63,33 @@ export default function Home() {
         </div>
 
         <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
-          <Link 
-            href="/signup" 
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg"
-          >
-            Get Started
-          </Link>
-          <Link 
-            href="/login" 
-            className="inline-block bg-gray-600 hover:bg-gray-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg"
-          >
-            Sign In
-          </Link>
+          {!loading && (
+            <>
+              {isAuthenticated ? (
+                <Link 
+                  href="/dashboard" 
+                  className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg"
+                >
+                  Go to Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link 
+                    href="/signup" 
+                    className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg"
+                  >
+                    Get Started
+                  </Link>
+                  <Link 
+                    href="/login" 
+                    className="inline-block bg-gray-600 hover:bg-gray-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg"
+                  >
+                    Sign In
+                  </Link>
+                </>
+              )}
+            </>
+          )}
         </div>
       </div>
     </main>

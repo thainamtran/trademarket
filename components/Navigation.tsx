@@ -14,17 +14,47 @@ export default function Navigation() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabaseClient.auth.getSession()
-      setIsAuthenticated(!!session)
-      setLoading(false)
+      try {
+        console.log('[Navigation] Starting checkAuth...')
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession()
+        
+        if (sessionError) {
+          console.error('[Navigation] Session error:', sessionError)
+          setIsAuthenticated(false)
+          setLoading(false)
+          return
+        }
+
+        console.log('[Navigation] Session check:', { 
+          hasSession: !!session, 
+          userId: session?.user?.id,
+          email: session?.user?.email 
+        })
+        
+        const isAuth = !!session
+        setIsAuthenticated(isAuth)
+      } catch (err: any) {
+        console.error('[Navigation] checkAuth exception:', err)
+        console.error('[Navigation] Exception details:', {
+          message: err?.message,
+          stack: err?.stack,
+          name: err?.name,
+        })
+        setIsAuthenticated(false)
+      } finally {
+        console.log('[Navigation] checkAuth completed, setting loading to false')
+        setLoading(false)
+      }
     }
 
     checkAuth()
 
     // Listen for auth changes
     const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
-      (_event, session) => {
-        setIsAuthenticated(!!session)
+      async (event, session) => {
+        console.log('[Navigation] Auth state changed:', { event, hasSession: !!session, userId: session?.user?.id })
+        const isAuth = !!session
+        setIsAuthenticated(isAuth)
       }
     )
 

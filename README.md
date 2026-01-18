@@ -44,7 +44,13 @@ Edit `.env.local`:
 ```
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+ALPHA_VANTAGE_API_KEY=your_alpha_vantage_api_key
 ```
+
+**Get Alpha Vantage API Key** (for stock market data):
+- Sign up for free at [Alpha Vantage](https://www.alphavantage.co/support/#api-key)
+- Copy your API key and add it to `.env.local`
+- Note: Free tier allows 5 API calls per minute and 500 calls per day
 
 4. **Run the development server:**
 

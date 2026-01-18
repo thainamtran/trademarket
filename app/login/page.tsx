@@ -20,6 +20,18 @@ export default function LoginPage() {
     const password = formData.get('password') as string
 
     try {
+      // Test Supabase connection first
+      console.log('Testing Supabase connection...')
+      try {
+        const { data: testSession } = await supabaseClient.auth.getSession()
+        console.log('Supabase connection test passed')
+      } catch (connError) {
+        console.error('Supabase connection test failed:', connError)
+        setError('Cannot connect to database. Please check your connection and try again.')
+        setLoading(false)
+        return
+      }
+
       // Step 1: Authenticate user with Supabase Auth
       const { data: authData, error: signInError } = await supabaseClient.auth.signInWithPassword({
         email,
@@ -38,53 +50,59 @@ export default function LoginPage() {
         return
       }
 
-      // Step 2: Verify user profile exists in profiles table
-      const { data: profileData, error: profileError } = await supabaseClient
-        .from('profiles')
-        .select('id, full_name, email, current_balance, total_value')
-        .eq('id', authData.user.id)
-        .single()
+      // Step 2: Verify user profile exists in profiles table (non-blocking)
+      try {
+        const { data: profileData, error: profileError } = await supabaseClient
+          .from('profiles')
+          .select('id')
+          .eq('id', authData.user.id)
+          .single()
 
-      if (profileError) {
-        // If profile doesn't exist, create one
-        if (profileError.code === 'PGRST116' || profileError.message.includes('No rows')) {
-          console.log('Profile not found, creating new profile...')
-          
-          const { error: createProfileError } = await supabaseClient
-            .from('profiles')
-            .insert({
-              id: authData.user.id,
-              full_name: authData.user.user_metadata?.full_name || '',
-              email: authData.user.email || email,
-              initial_balance: 100000.00,
-              current_balance: 100000.00,
-              total_value: 100000.00,
-            })
+        if (profileError) {
+          // If profile doesn't exist, create one
+          if (profileError.code === 'PGRST116' || profileError.message.includes('No rows') || profileError.message.includes('does not exist')) {
+            console.log('Profile not found, creating new profile...')
+            
+            const { error: createProfileError } = await supabaseClient
+              .from('profiles')
+              .insert({
+                id: authData.user.id,
+                full_name: authData.user.user_metadata?.full_name || '',
+                email: authData.user.email || email,
+                initial_balance: 100000.00,
+                current_balance: 100000.00,
+                total_value: 100000.00,
+              })
 
-          if (createProfileError) {
-            console.error('Profile creation error:', createProfileError)
-            setError('Failed to create user profile. Please contact support.')
-            setLoading(false)
-            return
+            if (createProfileError) {
+              // Log error but don't block login - profile might already exist or be created by trigger
+              console.warn('Profile creation warning:', createProfileError)
+              // Check if it's a duplicate key error (profile already exists)
+              if (!createProfileError.code || createProfileError.code !== '23505') {
+                console.error('Non-duplicate profile creation error:', createProfileError)
+              }
+            }
+          } else {
+            // Log other database errors but don't block login
+            console.warn('Profile fetch warning:', profileError)
           }
-        } else {
-          // Other database error
-          console.error('Profile fetch error:', profileError)
-          setError('Failed to verify user profile. Please try again.')
-          setLoading(false)
-          return
         }
+      } catch (profileCheckErr) {
+        // Don't block login if profile check fails
+        console.warn('Profile check error (non-blocking):', profileCheckErr)
       }
 
-      // Step 3: Login successful, redirect to dashboard
-      if (profileData || !profileError) {
-        router.push('/dashboard')
-        router.refresh()
-      }
+      // Step 3: Login successful, log and redirect to dashboard
+      console.log('User login successful:', {
+        userId: authData.user.id,
+        email: authData.user.email,
+        timestamp: new Date().toISOString(),
+      })
+      router.push('/dashboard')
+      router.refresh()
     } catch (err) {
       setError('An unexpected error occurred. Please try again.')
       console.error('Login error:', err)
-    } finally {
       setLoading(false)
     }
   }
