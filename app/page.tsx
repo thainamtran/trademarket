@@ -57,7 +57,7 @@ export default function Home() {
           <div className="bg-white rounded-lg shadow-lg p-8">
             <h2 className="text-3xl font-bold mb-4 text-gray-900">Perfect for Beginners</h2>
             <p className="text-lg text-gray-700 leading-relaxed">
-              Whether you're completely new to trading or looking to refine your skills, TradeMarket provides the tools and environment you need to succeed. Start your trading journey today and learn the fundamentals of stock trading in a risk-free setting.
+              Whether you&apos;re completely new to trading or looking to refine your skills, TradeMarket provides the tools and environment you need to succeed. Start your trading journey today and learn the fundamentals of stock trading in a risk-free setting.
             </p>
           </div>
         </div>

@@ -239,7 +239,7 @@ export default function DashboardPage() {
             </div>
           ) : positions.length === 0 ? (
             <div className="bg-white rounded-lg shadow-md p-8 text-center text-gray-500">
-              <p>You don't have any positions yet.</p>
+              <p>You don&apos;t have any positions yet.</p>
               <p className="text-sm mt-2">Search for stocks above to start building your portfolio.</p>
             </div>
           ) : (
