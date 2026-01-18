@@ -23,6 +23,18 @@ interface Stock {
   matchScore: string
 }
 
+interface Position {
+  symbol: string
+  quantity: number
+  averagePrice: number
+  currentPrice: number
+  totalValue: number
+  totalCost: number
+  profitLoss: number
+  profitLossPercent: number
+  purchaseDates: string[]
+}
+
 export default function DashboardPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
@@ -32,6 +44,8 @@ export default function DashboardPage() {
   const [searchResults, setSearchResults] = useState<Stock[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [showResults, setShowResults] = useState(false)
+  const [positions, setPositions] = useState<Position[]>([])
+  const [loadingPositions, setLoadingPositions] = useState(true)
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -65,7 +79,30 @@ export default function DashboardPage() {
       }
     }
 
+    const loadPositions = async () => {
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession()
+        if (!session) return
+
+        const response = await fetch('/api/positions', {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+        })
+
+        const data = await response.json()
+        if (response.ok && data.positions) {
+          setPositions(data.positions)
+        }
+      } catch (err) {
+        console.error('Failed to load positions:', err)
+      } finally {
+        setLoadingPositions(false)
+      }
+    }
+
     loadProfile()
+    loadPositions()
   }, [router])
 
   const handleSearch = async (query: string) => {
@@ -144,8 +181,6 @@ export default function DashboardPage() {
     <main className="min-h-screen bg-gray-50 px-4 py-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Search Stocks</h1>
-          
           {/* Search Input */}
           <div className="relative">
             <input
@@ -189,6 +224,84 @@ export default function DashboardPage() {
           {showResults && searchQuery && searchResults.length === 0 && !isSearching && (
             <div className="mt-4 bg-white rounded-lg shadow-md border border-gray-200 p-4 text-center text-gray-500">
               No stocks found. Try a different search term.
+            </div>
+          )}
+        </div>
+
+        {/* Positions Section */}
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">My Positions</h2>
+          
+          {loadingPositions ? (
+            <div className="bg-white rounded-lg shadow-md p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading positions...</p>
+            </div>
+          ) : positions.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-md p-8 text-center text-gray-500">
+              <p>You don't have any positions yet.</p>
+              <p className="text-sm mt-2">Search for stocks above to start building your portfolio.</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Symbol
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Quantity
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Current Price
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {positions.map((position) => {
+                      return (
+                        <tr key={position.symbol} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <Link
+                              href={`/dashboard/stock/${position.symbol}`}
+                              className="text-blue-600 hover:text-blue-800 font-semibold"
+                            >
+                              {position.symbol}
+                            </Link>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {position.quantity.toFixed(4)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${position.currentPrice.toFixed(2)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <div className="flex gap-2">
+                              <Link
+                                href={`/dashboard/stock/${position.symbol}`}
+                                className="px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-xs font-medium"
+                              >
+                                Buy
+                              </Link>
+                              <Link
+                                href={`/dashboard/sell/${position.symbol}`}
+                                className="px-3 py-1.5 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-xs font-medium"
+                              >
+                                Sell
+                              </Link>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

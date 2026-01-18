@@ -18,20 +18,26 @@ interface StockQuote {
   changePercent: string
 }
 
-export default function StockDetailPage() {
+interface Holding {
+  symbol: string
+  totalQuantity: number
+}
+
+export default function SellStockPage() {
   const router = useRouter()
   const params = useParams()
   const symbol = params.symbol as string
   const [loading, setLoading] = useState(true)
   const [quote, setQuote] = useState<StockQuote | null>(null)
+  const [holding, setHolding] = useState<Holding | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [buyQuantity, setBuyQuantity] = useState<string>('1')
-  const [buying, setBuying] = useState(false)
-  const [buySuccess, setBuySuccess] = useState<string | null>(null)
-  const [buyError, setBuyError] = useState<string | null>(null)
+  const [sellQuantity, setSellQuantity] = useState<string>('')
+  const [selling, setSelling] = useState(false)
+  const [sellSuccess, setSellSuccess] = useState<string | null>(null)
+  const [sellError, setSellError] = useState<string | null>(null)
 
   useEffect(() => {
-    const checkAuthAndLoadQuote = async () => {
+    const checkAuthAndLoadData = async () => {
       try {
         // Check if user is authenticated
         const { data: { session } } = await supabaseClient.auth.getSession()
@@ -42,28 +48,49 @@ export default function StockDetailPage() {
         }
 
         // Load stock quote
-        const response = await fetch(`/api/stocks/quote?symbol=${encodeURIComponent(symbol)}`)
-        const data = await response.json()
+        const quoteResponse = await fetch(`/api/stocks/quote?symbol=${encodeURIComponent(symbol)}`)
+        const quoteData = await quoteResponse.json()
 
-        if (!response.ok || data.error) {
-          const errorMessage = data.error || 'Failed to load stock information'
-          console.error('Stock quote API error:', { status: response.status, error: errorMessage })
+        if (!quoteResponse.ok || quoteData.error) {
+          const errorMessage = quoteData.error || 'Failed to load stock information'
           setError(errorMessage)
-        } else if (data.quote) {
-          setQuote(data.quote)
-        } else {
-          setError('No stock data received from server')
+        } else if (quoteData.quote) {
+          setQuote(quoteData.quote)
+        }
+
+        // Load user's holdings for this symbol
+        const { data: { session: holdingsSession } } = await supabaseClient.auth.getSession()
+        if (holdingsSession) {
+          const positionsResponse = await fetch('/api/positions', {
+            headers: {
+              'Authorization': `Bearer ${holdingsSession.access_token}`,
+            },
+          })
+          const positionsData = await positionsResponse.json()
+
+          if (positionsResponse.ok && positionsData.positions) {
+            const position = positionsData.positions.find((p: any) => p.symbol === symbol.toUpperCase())
+            if (position) {
+              setHolding({
+                symbol: position.symbol,
+                totalQuantity: position.quantity,
+              })
+              setSellQuantity(position.quantity.toString())
+            } else {
+              setError(`You don't own any shares of ${symbol.toUpperCase()}`)
+            }
+          }
         }
       } catch (err) {
         setError('Failed to load stock information. Please try again.')
-        console.error('Stock quote error:', err)
+        console.error('Sell page error:', err)
       } finally {
         setLoading(false)
       }
     }
 
     if (symbol) {
-      checkAuthAndLoadQuote()
+      checkAuthAndLoadData()
     }
   }, [symbol, router])
 
@@ -82,17 +109,23 @@ export default function StockDetailPage() {
     return new Intl.NumberFormat('en-US').format(num)
   }
 
-  const handleBuyStock = async (e: React.FormEvent) => {
+  const handleSellStock = async (e: React.FormEvent) => {
     e.preventDefault()
-    setBuying(true)
-    setBuyError(null)
-    setBuySuccess(null)
+    setSelling(true)
+    setSellError(null)
+    setSellSuccess(null)
 
     try {
-      const quantity = parseFloat(buyQuantity)
+      const quantity = parseFloat(sellQuantity)
       if (!quantity || quantity <= 0) {
-        setBuyError('Please enter a valid quantity')
-        setBuying(false)
+        setSellError('Please enter a valid quantity')
+        setSelling(false)
+        return
+      }
+
+      if (holding && quantity > holding.totalQuantity) {
+        setSellError(`You only own ${holding.totalQuantity.toFixed(4)} shares`)
+        setSelling(false)
         return
       }
 
@@ -100,12 +133,12 @@ export default function StockDetailPage() {
       const { data: { session } } = await supabaseClient.auth.getSession()
       
       if (!session) {
-        setBuyError('Please log in to purchase stocks')
-        setBuying(false)
+        setSellError('Please log in to sell stocks')
+        setSelling(false)
         return
       }
 
-      const response = await fetch('/api/stocks/buy', {
+      const response = await fetch('/api/stocks/sell', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -121,20 +154,19 @@ export default function StockDetailPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        setBuyError(data.error || 'Failed to purchase stock')
+        setSellError(data.error || 'Failed to sell stock')
       } else {
-        setBuySuccess(data.message)
-        setBuyQuantity('1')
-        // Refresh the page after 2 seconds to update balance
+        setSellSuccess(data.message)
+        // Refresh and redirect to dashboard after 2 seconds
         setTimeout(() => {
-          router.refresh()
+          router.push('/dashboard')
         }, 2000)
       }
     } catch (err) {
-      setBuyError('An unexpected error occurred. Please try again.')
-      console.error('Buy stock error:', err)
+      setSellError('An unexpected error occurred. Please try again.')
+      console.error('Sell stock error:', err)
     } finally {
-      setBuying(false)
+      setSelling(false)
     }
   }
 
@@ -154,7 +186,7 @@ export default function StockDetailPage() {
       <main className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
         <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Stock Not Found</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Cannot Sell Stock</h1>
             <p className="text-gray-600">Symbol: <span className="font-mono font-semibold">{symbol?.toUpperCase()}</span></p>
           </div>
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6">
@@ -168,23 +200,13 @@ export default function StockDetailPage() {
             >
               ← Back to Dashboard
             </Link>
-            <button
-              onClick={() => {
-                setError(null)
-                setLoading(true)
-                window.location.reload()
-              }}
-              className="block w-full text-center bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-            >
-              Try Again
-            </button>
           </div>
         </div>
       </main>
     )
   }
 
-  if (!quote) {
+  if (!quote || !holding) {
     return null
   }
 
@@ -204,7 +226,7 @@ export default function StockDetailPage() {
         <div className="bg-white rounded-lg shadow-md p-8">
           {/* Stock Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">{quote.symbol}</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">Sell {quote.symbol}</h1>
             <div className="flex items-baseline gap-4">
               <p className="text-3xl font-bold text-gray-900">
                 {formatCurrency(quote.price)}
@@ -220,102 +242,76 @@ export default function StockDetailPage() {
             </div>
           </div>
 
-          {/* Stock Details Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="border-b md:border-b-0 md:border-r border-gray-200 pb-4 md:pb-0 md:pr-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Open</h3>
-              <p className="text-2xl font-semibold text-gray-900">
-                {formatCurrency(quote.open)}
-              </p>
-            </div>
-
-            <div className="border-b md:border-b-0 border-gray-200 pb-4 md:pb-0">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Previous Close</h3>
-              <p className="text-2xl font-semibold text-gray-900">
-                {formatCurrency(quote.previousClose)}
-              </p>
-            </div>
-
-            <div className="border-b md:border-b-0 md:border-r border-gray-200 pb-4 md:pb-0 md:pr-6 pt-4 md:pt-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">High</h3>
-              <p className="text-2xl font-semibold text-green-600">
-                {formatCurrency(quote.high)}
-              </p>
-            </div>
-
-            <div className="border-b md:border-b-0 border-gray-200 pb-4 md:pb-0 pt-4 md:pt-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Low</h3>
-              <p className="text-2xl font-semibold text-red-600">
-                {formatCurrency(quote.low)}
-              </p>
-            </div>
-
-            <div className="border-b md:border-b-0 md:border-r border-gray-200 pb-4 md:pb-0 md:pr-6 pt-4 md:pt-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Volume</h3>
-              <p className="text-2xl font-semibold text-gray-900">
-                {formatNumber(quote.volume)}
-              </p>
-            </div>
-
-            <div className="pt-4 md:pt-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Latest Trading Day</h3>
-              <p className="text-2xl font-semibold text-gray-900">
-                {quote.latestTradingDay}
-              </p>
-            </div>
+          {/* Holding Info */}
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-gray-600">You own</p>
+            <p className="text-2xl font-bold text-gray-900">{holding.totalQuantity.toFixed(4)} shares</p>
           </div>
 
-          {/* Trading Actions */}
+          {/* Sell Form */}
           <div className="mt-8 pt-8 border-t border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Trading Actions</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Sell Stock</h2>
             
-            {buySuccess && (
+            {sellSuccess && (
               <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">
-                <p className="font-semibold">{buySuccess}</p>
+                <p className="font-semibold">{sellSuccess}</p>
+                <p className="text-sm mt-1">Redirecting to dashboard...</p>
               </div>
             )}
 
-            {buyError && (
+            {sellError && (
               <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-                <p className="font-semibold">{buyError}</p>
+                <p className="font-semibold">{sellError}</p>
               </div>
             )}
 
-            <form onSubmit={handleBuyStock} className="space-y-4">
+            <form onSubmit={handleSellStock} className="space-y-4">
               <div>
                 <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-2">
-                  Quantity (Number of Shares)
+                  Quantity (Number of Shares to Sell)
                 </label>
                 <div className="flex gap-4 items-end">
                   <input
                     type="number"
                     id="quantity"
-                    min="0.01"
-                    step="0.01"
-                    value={buyQuantity}
-                    onChange={(e) => setBuyQuantity(e.target.value)}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    min="0.0001"
+                    step="0.0001"
+                    max={holding.totalQuantity}
+                    value={sellQuantity}
+                    onChange={(e) => setSellQuantity(e.target.value)}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     placeholder="Enter quantity"
                     required
-                    disabled={buying}
+                    disabled={selling}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setSellQuantity(holding.totalQuantity.toString())}
+                    className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                    disabled={selling}
+                  >
+                    Max
+                  </button>
                   {quote && (
                     <div className="text-sm text-gray-600">
-                      <p>Total: {formatCurrency((parseFloat(quote.price) * parseFloat(buyQuantity || '0')).toString())}</p>
+                      <p>Total: {formatCurrency((parseFloat(quote.price) * parseFloat(sellQuantity || '0')).toString())}</p>
                     </div>
                   )}
                 </div>
+                <p className="mt-1 text-xs text-gray-500">
+                  Maximum: {holding.totalQuantity.toFixed(4)} shares
+                </p>
               </div>
               
               <button
                 type="submit"
-                disabled={buying || !quote}
-                className="w-full px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                disabled={selling || !quote}
+                className="w-full px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
               >
-                {buying ? 'Processing...' : `Buy ${quote?.symbol || 'Stock'}`}
+                {selling ? 'Processing...' : `Sell ${quote?.symbol || 'Stock'}`}
               </button>
-              <p className="text-sm text-gray-500">
-                Stock will be purchased at the current market price: {quote ? formatCurrency(quote.price) : 'N/A'}
+              <p className="text-sm text-gray-500 text-center">
+                Stock will be sold at the current market price: {quote ? formatCurrency(quote.price) : 'N/A'}
               </p>
             </form>
           </div>

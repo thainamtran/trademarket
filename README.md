@@ -44,13 +44,15 @@ Edit `.env.local`:
 ```
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-ALPHA_VANTAGE_API_KEY=your_alpha_vantage_api_key
+FINNHUB_API_KEY=your_finnhub_api_key (optional)
 ```
 
-**Get Alpha Vantage API Key** (for stock market data):
-- Sign up for free at [Alpha Vantage](https://www.alphavantage.co/support/#api-key)
-- Copy your API key and add it to `.env.local`
-- Note: Free tier allows 5 API calls per minute and 500 calls per day
+**Stock Market Data API:**
+- **Default**: Uses Yahoo Finance API (no API key required, unlimited requests)
+- **Optional**: Finnhub API for enhanced features
+  - Sign up for free at [Finnhub](https://finnhub.io/register)
+  - Copy your API key and add it to `.env.local` as `FINNHUB_API_KEY`
+  - Free tier allows 60 API calls per minute
 
 4. **Run the development server:**
 
