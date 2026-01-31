@@ -125,9 +125,9 @@ export default function StockDetailPage() {
       } else {
         setBuySuccess(data.message)
         setBuyQuantity('1')
-        // Refresh the page after 2 seconds to update balance
+        // Navigate to dashboard after 2 seconds
         setTimeout(() => {
-          router.refresh()
+          router.push('/dashboard')
         }, 2000)
       }
     } catch (err) {
@@ -272,6 +272,7 @@ export default function StockDetailPage() {
             {buySuccess && (
               <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">
                 <p className="font-semibold">{buySuccess}</p>
+                <p className="text-sm mt-1">Redirecting to dashboard...</p>
               </div>
             )}
 
