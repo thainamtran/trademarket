@@ -167,7 +167,10 @@ export default function StockChart({ symbol, height = 400 }: StockChartProps) {
               border: '1px solid #e5e7eb',
               borderRadius: '8px',
             }}
-            formatter={(value: number) => formatCurrency(value)}
+            formatter={(value: number | undefined) => {
+              if (value === undefined) return ''
+              return formatCurrency(value)
+            }}
             labelFormatter={(label) => `Date: ${formatDate(label)}`}
           />
           <Legend />
