@@ -36,7 +36,7 @@ const periods = [
   { label: 'YTD', value: 'ytd' },
 ]
 
-export default function StockChart({ symbol, height = 400 }: StockChartProps) {
+export default function StockChart({ symbol, height = 200 }: StockChartProps) {
   const [data, setData] = useState<HistoricalData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -130,15 +130,15 @@ export default function StockChart({ symbol, height = 400 }: StockChartProps) {
   }
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-md p-4 md:p-6 overflow-hidden">
-      <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        <h3 className="text-lg font-semibold text-gray-900">Price Chart</h3>
+    <div className="w-full bg-white rounded-lg shadow-md p-2 sm:p-3 md:p-4 overflow-hidden">
+      <div className="mb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+        <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900">Price Chart</h3>
         <div className="flex gap-2 overflow-x-auto pb-2 -mx-2 px-2 md:overflow-x-visible md:pb-0 md:mx-0 md:px-0">
           {periods.map((period) => (
             <button
               key={period.value}
               onClick={() => setSelectedPeriod(period.value)}
-              className={`px-3 py-1 text-sm rounded transition-colors whitespace-nowrap flex-shrink-0 ${
+              className={`px-2 py-0.5 text-xs sm:text-sm rounded transition-colors whitespace-nowrap flex-shrink-0 ${
                 selectedPeriod === period.value
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -174,14 +174,12 @@ export default function StockChart({ symbol, height = 400 }: StockChartProps) {
             }}
             labelFormatter={(label) => `Date: ${formatDate(label)}`}
           />
-          <Legend />
           <Line
             type="monotone"
             dataKey="close"
             stroke="#3b82f6"
             strokeWidth={2}
             dot={false}
-            name="Close Price"
           />
         </LineChart>
       </ResponsiveContainer>

@@ -202,16 +202,16 @@ export default function StockDetailPage() {
           ← Back to Dashboard
         </Link>
 
-        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 md:p-8">
+        <div className="bg-white rounded-lg shadow-md p-2 sm:p-3 md:p-4">
           {/* Stock Header */}
-          <div className="mb-4 sm:mb-6 md:mb-8">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">{quote.symbol}</h1>
-            <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4">
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900">
+          <div className="mb-2 sm:mb-3">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1">{quote.symbol}</h1>
+            <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
                 {formatCurrency(quote.price)}
               </p>
               <p
-                className={`text-lg sm:text-xl font-semibold ${
+                className={`text-sm sm:text-base md:text-lg font-semibold ${
                   isPositive ? 'text-green-600' : 'text-red-600'
                 }`}
               >
@@ -222,12 +222,12 @@ export default function StockDetailPage() {
           </div>
 
           {/* Price Chart */}
-          <div className="mb-4 sm:mb-6 md:mb-8">
-            <StockChart symbol={quote.symbol} height={300} />
+          <div className="mb-3 sm:mb-4">
+            <StockChart symbol={quote.symbol} height={200} />
           </div>
 
           {/* Stock Details Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-2 sm:mb-3">
             <div className="border-b md:border-b-0 md:border-r border-gray-200 pb-4 md:pb-0 md:pr-6">
               <h3 className="text-sm font-medium text-gray-500 mb-2">Open</h3>
               <p className="text-2xl font-semibold text-gray-900">
@@ -272,8 +272,8 @@ export default function StockDetailPage() {
           </div>
 
           {/* Trading Actions */}
-          <div className="mt-8 pt-8 border-t border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Trading Actions</h2>
+          <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-200">
+            <h2 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 mb-2">Trading Actions</h2>
             
             {buySuccess && (
               <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">

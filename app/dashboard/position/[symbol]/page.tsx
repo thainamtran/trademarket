@@ -324,16 +324,16 @@ export default function PositionDetailPage() {
           ← Back to Dashboard
         </Link>
 
-        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 md:p-8">
+        <div className="bg-white rounded-lg shadow-md p-2 sm:p-3 md:p-4">
           {/* Stock Header */}
-          <div className="mb-4 sm:mb-6 md:mb-8">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">{quote.symbol}</h1>
-            <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4">
-              <p className="text-2xl sm:text-3xl font-bold text-gray-900">
+          <div className="mb-2 sm:mb-3">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 mb-1">{quote.symbol}</h1>
+            <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
+              <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
                 {formatCurrency(quote.price)}
               </p>
               <p
-                className={`text-lg sm:text-xl font-semibold ${
+                className={`text-sm sm:text-base md:text-lg font-semibold ${
                   isPositive ? 'text-green-600' : 'text-red-600'
                 }`}
               >
@@ -344,34 +344,34 @@ export default function PositionDetailPage() {
           </div>
 
           {/* Price Chart */}
-          <div className="mb-4 sm:mb-6 md:mb-8">
-            <StockChart symbol={quote.symbol} height={300} />
+          <div className="mb-3 sm:mb-4">
+            <StockChart symbol={quote.symbol} height={200} />
           </div>
 
           {/* Position Info */}
           {position && (
-            <div className="mb-4 sm:mb-6 md:mb-8 p-4 sm:p-6 bg-blue-50 border border-blue-200 rounded-lg">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Your Position</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="mb-2 sm:mb-3 p-2 sm:p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <h2 className="text-sm sm:text-base md:text-lg font-bold text-gray-900 mb-1 sm:mb-2">Your Position</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
-                  <p className="text-xs sm:text-sm text-gray-600">Quantity Owned</p>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900 break-words">{position.quantity.toFixed(4)} shares</p>
+                  <p className="text-xs text-gray-600">Quantity Owned</p>
+                  <p className="text-base sm:text-lg font-bold text-gray-900 break-words">{position.quantity.toFixed(4)} shares</p>
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm text-gray-600">Average Price</p>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{formatCurrency(position.averagePrice)}</p>
+                  <p className="text-xs text-gray-600">Average Price</p>
+                  <p className="text-base sm:text-lg font-bold text-gray-900">{formatCurrency(position.averagePrice)}</p>
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm text-gray-600">Total Cost</p>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{formatCurrency(position.totalCost)}</p>
+                  <p className="text-xs text-gray-600">Total Cost</p>
+                  <p className="text-base sm:text-lg font-bold text-gray-900">{formatCurrency(position.totalCost)}</p>
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm text-gray-600">Total Value</p>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900">{formatCurrency(position.totalValue)}</p>
+                  <p className="text-xs text-gray-600">Total Value</p>
+                  <p className="text-base sm:text-lg font-bold text-gray-900">{formatCurrency(position.totalValue)}</p>
                 </div>
                 <div className="sm:col-span-2">
-                  <p className="text-xs sm:text-sm text-gray-600">Profit/Loss</p>
-                  <p className={`text-xl sm:text-2xl font-bold break-words ${position.profitLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <p className="text-xs text-gray-600">Profit/Loss</p>
+                  <p className={`text-base sm:text-lg font-bold break-words ${position.profitLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                     {position.profitLoss >= 0 ? '+' : ''}{formatCurrency(position.profitLoss)} ({position.profitLossPercent >= 0 ? '+' : ''}{position.profitLossPercent.toFixed(2)}%)
                   </p>
                 </div>
@@ -380,7 +380,7 @@ export default function PositionDetailPage() {
           )}
 
           {/* Stock Details Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6 md:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-2 sm:mb-3">
             <div className="border-b md:border-b-0 md:border-r border-gray-200 pb-4 md:pb-0 md:pr-6">
               <h3 className="text-sm font-medium text-gray-500 mb-2">Open</h3>
               <p className="text-2xl font-semibold text-gray-900">
@@ -485,8 +485,8 @@ export default function PositionDetailPage() {
 
             {/* Sell Section */}
             {position && position.quantity > 0 && (
-              <div className="p-4 sm:p-6 bg-red-50 border border-red-200 rounded-lg">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Sell Stock</h3>
+              <div className="p-2 sm:p-3 bg-red-50 border border-red-200 rounded-lg">
+                <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-2">Sell Stock</h3>
                 
                 {sellSuccess && (
                   <div className="mb-4 bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded-md">
