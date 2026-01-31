@@ -279,7 +279,7 @@ export default function SellStockPage() {
                     max={holding.totalQuantity}
                     value={sellQuantity}
                     onChange={(e) => setSellQuantity(e.target.value)}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    className="flex-1 px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     placeholder="Enter quantity"
                     required
                     disabled={selling}

@@ -294,7 +294,7 @@ export default function StockDetailPage() {
                     step="0.01"
                     value={buyQuantity}
                     onChange={(e) => setBuyQuantity(e.target.value)}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="flex-1 px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter quantity"
                     required
                     disabled={buying}
