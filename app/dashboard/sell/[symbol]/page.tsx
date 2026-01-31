@@ -215,25 +215,25 @@ export default function SellStockPage() {
   const isPositive = changeValue >= 0
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-8">
+    <main className="min-h-screen bg-gray-50 px-2 sm:px-4 py-4 sm:py-8">
       <div className="max-w-4xl mx-auto">
         <Link
           href="/dashboard"
-          className="inline-block text-blue-600 hover:text-blue-500 mb-6"
+          className="inline-block text-blue-600 hover:text-blue-500 mb-4 sm:mb-6 text-sm sm:text-base"
         >
           ← Back to Dashboard
         </Link>
 
-        <div className="bg-white rounded-lg shadow-md p-8">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 md:p-8">
           {/* Stock Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Sell {quote.symbol}</h1>
-            <div className="flex items-baseline gap-4">
-              <p className="text-3xl font-bold text-gray-900">
+          <div className="mb-4 sm:mb-6 md:mb-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Sell {quote.symbol}</h1>
+            <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900">
                 {formatCurrency(quote.price)}
               </p>
               <p
-                className={`text-xl font-semibold ${
+                className={`text-lg sm:text-xl font-semibold ${
                   isPositive ? 'text-green-600' : 'text-red-600'
                 }`}
               >
@@ -244,19 +244,19 @@ export default function SellStockPage() {
           </div>
 
           {/* Price Chart */}
-          <div className="mb-8">
-            <StockChart symbol={quote.symbol} height={350} />
+          <div className="mb-4 sm:mb-6 md:mb-8">
+            <StockChart symbol={quote.symbol} height={300} />
           </div>
 
           {/* Holding Info */}
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-gray-600">You own</p>
-            <p className="text-2xl font-bold text-gray-900">{holding.totalQuantity.toFixed(4)} shares</p>
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-xs sm:text-sm text-gray-600">You own</p>
+            <p className="text-xl sm:text-2xl font-bold text-gray-900 break-words">{holding.totalQuantity.toFixed(4)} shares</p>
           </div>
 
           {/* Sell Form */}
-          <div className="mt-8 pt-8 border-t border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Sell Stock</h2>
+          <div className="mt-4 sm:mt-6 md:mt-8 pt-4 sm:pt-6 md:pt-8 border-t border-gray-200">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Sell Stock</h2>
             
             {sellSuccess && (
               <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">

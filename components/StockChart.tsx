@@ -130,15 +130,15 @@ export default function StockChart({ symbol, height = 400 }: StockChartProps) {
   }
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-md p-6">
-      <div className="mb-4 flex items-center justify-between">
+    <div className="w-full bg-white rounded-lg shadow-md p-4 md:p-6 overflow-hidden">
+      <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
         <h3 className="text-lg font-semibold text-gray-900">Price Chart</h3>
-        <div className="flex gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-2 -mx-2 px-2 md:overflow-x-visible md:pb-0 md:mx-0 md:px-0">
           {periods.map((period) => (
             <button
               key={period.value}
               onClick={() => setSelectedPeriod(period.value)}
-              className={`px-3 py-1 text-sm rounded transition-colors ${
+              className={`px-3 py-1 text-sm rounded transition-colors whitespace-nowrap flex-shrink-0 ${
                 selectedPeriod === period.value
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -149,7 +149,8 @@ export default function StockChart({ symbol, height = 400 }: StockChartProps) {
           ))}
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={height}>
+      <div className="w-full overflow-hidden">
+        <ResponsiveContainer width="100%" height={height}>
         <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
@@ -184,6 +185,7 @@ export default function StockChart({ symbol, height = 400 }: StockChartProps) {
           />
         </LineChart>
       </ResponsiveContainer>
+      </div>
     </div>
   )
 }

@@ -193,25 +193,25 @@ export default function StockDetailPage() {
   const isPositive = changeValue >= 0
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-8">
+    <main className="min-h-screen bg-gray-50 px-2 sm:px-4 py-4 sm:py-8">
       <div className="max-w-4xl mx-auto">
         <Link
           href="/dashboard"
-          className="inline-block text-blue-600 hover:text-blue-500 mb-6"
+          className="inline-block text-blue-600 hover:text-blue-500 mb-4 sm:mb-6 text-sm sm:text-base"
         >
           ← Back to Dashboard
         </Link>
 
-        <div className="bg-white rounded-lg shadow-md p-8">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 md:p-8">
           {/* Stock Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">{quote.symbol}</h1>
-            <div className="flex items-baseline gap-4">
-              <p className="text-3xl font-bold text-gray-900">
+          <div className="mb-4 sm:mb-6 md:mb-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">{quote.symbol}</h1>
+            <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4">
+              <p className="text-2xl sm:text-3xl font-bold text-gray-900">
                 {formatCurrency(quote.price)}
               </p>
               <p
-                className={`text-xl font-semibold ${
+                className={`text-lg sm:text-xl font-semibold ${
                   isPositive ? 'text-green-600' : 'text-red-600'
                 }`}
               >
@@ -222,12 +222,12 @@ export default function StockDetailPage() {
           </div>
 
           {/* Price Chart */}
-          <div className="mb-8">
-            <StockChart symbol={quote.symbol} height={350} />
+          <div className="mb-4 sm:mb-6 md:mb-8">
+            <StockChart symbol={quote.symbol} height={300} />
           </div>
 
           {/* Stock Details Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="border-b md:border-b-0 md:border-r border-gray-200 pb-4 md:pb-0 md:pr-6">
               <h3 className="text-sm font-medium text-gray-500 mb-2">Open</h3>
               <p className="text-2xl font-semibold text-gray-900">

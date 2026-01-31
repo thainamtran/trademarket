@@ -179,7 +179,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-8">
+    <main className="min-h-screen bg-gray-50 px-2 sm:px-4 py-4 sm:py-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           {/* Search Input */}
