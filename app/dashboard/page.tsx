@@ -265,14 +265,15 @@ export default function DashboardPage() {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {positions.map((position) => {
                       return (
-                        <tr key={position.symbol} className="hover:bg-gray-50">
+                        <tr 
+                          key={position.symbol} 
+                          className="hover:bg-gray-50 cursor-pointer"
+                          onClick={() => router.push(`/dashboard/position/${position.symbol}`)}
+                        >
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <Link
-                              href={`/dashboard/stock/${position.symbol}`}
-                              className="text-blue-600 hover:text-blue-800 font-semibold"
-                            >
+                            <span className="text-blue-600 hover:text-blue-800 font-semibold">
                               {position.symbol}
-                            </Link>
+                            </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {position.quantity.toFixed(4)}
@@ -281,7 +282,7 @@ export default function DashboardPage() {
                             ${position.currentPrice.toFixed(2)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <div className="flex gap-2">
+                            <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                               <Link
                                 href={`/dashboard/stock/${position.symbol}`}
                                 className="px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-xs font-medium"
