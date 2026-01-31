@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { supabaseClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import StockChart from '@/components/StockChart'
 
 interface StockQuote {
   symbol: string
@@ -218,6 +219,11 @@ export default function StockDetailPage() {
                 {formatCurrency(quote.change)} ({quote.changePercent})
               </p>
             </div>
+          </div>
+
+          {/* Price Chart */}
+          <div className="mb-8">
+            <StockChart symbol={quote.symbol} height={350} />
           </div>
 
           {/* Stock Details Grid */}

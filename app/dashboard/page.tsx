@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabaseClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import PortfolioBalanceChart from '@/components/PortfolioBalanceChart'
 
 interface Profile {
   id: string
@@ -226,6 +227,11 @@ export default function DashboardPage() {
               No stocks found. Try a different search term.
             </div>
           )}
+        </div>
+
+        {/* Portfolio Balance Chart */}
+        <div className="mt-8">
+          <PortfolioBalanceChart height={400} />
         </div>
 
         {/* Positions Section */}
